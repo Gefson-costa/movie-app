@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from "react";
 import Search from "./components/Search";
+import Spinner from "./components/Spinner";
+import MovieCard from "./components/MovieCard";
 
 
 
@@ -23,9 +25,14 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [movieList, setMovieList] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const fetchMovies = async () => {
+
+    setIsLoading(true)
+    setErrorMessage('')
+
     try {
       const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`
       const response = await fetch(endpoint, API_OPTIONS);
@@ -44,11 +51,13 @@ function App() {
         return
       }
 
-      setMovieList(data.Response || [])
+      setMovieList(data.results || [])
 
     } catch (error) {
       console.log(`Error fetching movies: ${error}`)
       setErrorMessage(`Error fetching movies, Please try again later`)
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -68,8 +77,18 @@ function App() {
         </header>
 
         <section className="all-movies">
-          <h2>All movies</h2>
-          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+          <h2 className="mt-[400px]">All movies</h2>
+
+          {isLoading ? (
+            <Spinner />
+          ) : errorMessage ? (
+            <p className="text-red-500">{errorMessage}</p>
+          ) :
+            <ul>
+              {movieList.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </ul>}
         </section>
 
       </div>
