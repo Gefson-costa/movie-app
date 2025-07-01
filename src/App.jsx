@@ -6,7 +6,7 @@ import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
 import { useDebounce } from "react-use";
-import { updateSearchCount } from "./appwrite";
+import { getTrendingMovies, updateSearchCount } from "./appwrite";
 
 
 const API_BASE_URL = 'https://api.themoviedb.org/3'
@@ -28,6 +28,7 @@ function App() {
   const [movieList, setMovieList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
 
 
@@ -67,7 +68,7 @@ function App() {
 
       setMovieList(data.results || [])
 
-      
+
       if (query && data.results.length > 0) {
         await updateSearchCount(query, data.results[0])
       }
@@ -80,9 +81,24 @@ function App() {
     }
   }
 
+  const loadTrendingMovies = async () => {
+    try {
+      const movies = await getTrendingMovies()
+
+      setTrendingMovies(movies)
+    } catch (error) {
+      console.error(`Error fetching trending movies: ${error}`)
+
+    }
+  }
+
   useEffect(() => {
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm])
+
+  useEffect(() => {
+    loadTrendingMovies()
+  }, [])
 
   return (
     <main>
@@ -95,8 +111,22 @@ function App() {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
 
+        {trendingMovies.length > 0 &&
+          <section className="trending">
+            <h2>Trending Movies</h2>
+            <ul>
+              {trendingMovies.map((movie, index) => (
+                <li key={movie.$id} >
+                  <p>{index + 1}</p>
+                  <img src={movie.poster_url} />
+                </li>
+              ))}
+            </ul>
+          </section>}
+
+
         <section className="all-movies">
-          <h2 className="mt-[400px]">All movies</h2>
+          <h2 className="mt-[100px]">All movies</h2>
 
           {isLoading ? (
             <Spinner />
