@@ -107,7 +107,7 @@ function App() {
       <div className="wrapper">
         <img src="./hero.png" alt="Hero Banner" />
         <header>
-          <h1>Find <span className="text-gradient">Movies</span> and <span className="text-gradient">Enjoy</span></h1>
+          <h1>Find <span className="text-gradient">Cona</span> and <span className="text-gradient">Fode</span></h1>
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
         {/* Trending Movies */}
