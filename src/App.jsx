@@ -9,16 +9,28 @@ import { useDebounce } from "react-use";
 import { getTrendingMovies, updateSearchCount } from "./appwrite";
 
 
-const API_BASE_URL = 'https://api.themoviedb.org/3'
+// Remover constantes específicas da TMDB para usar proxy com fallback
+const TMDB_TOKEN = import.meta.env.VITE_TMDB_API_KEY
 
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY
-
-const API_OPTIONS = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${API_KEY}`
+function buildTmdbRequest(query) {
+  if (TMDB_TOKEN) {
+    const endpoint = query
+      ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}`
+      : `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc`
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${TMDB_TOKEN}`
+      }
+    }
+    return { endpoint, options }
   }
+  // Sem token no client: usar proxy serverless
+  const endpoint = query
+    ? `/api/tmdb?path=/search/movie&search=query=${encodeURIComponent(query)}`
+    : `/api/tmdb?path=/discover/movie&search=sort_by=popularity.desc`
+  return { endpoint, options: {} }
 }
 
 function App() {
@@ -28,12 +40,9 @@ function App() {
   const [movieList, setMovieList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
-  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [trendingMovies, setTrendingMovies] = useState([])
 
 
-
-  // Debounce the search term for prevent too many API requests
-  // by waiting for the user to stop typing for 500ms
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 
 
@@ -44,21 +53,14 @@ function App() {
 
 
     try {
-
-      //check this code later 
-      const endpoint = query
-        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`
-      const response = await fetch(endpoint, API_OPTIONS);
+      const { endpoint, options } = buildTmdbRequest(query)
+      const response = await fetch(endpoint, options)
 
       if (!response.ok) {
         throw new Error('failed to fetch movies')
       }
 
       const data = await response.json();
-
-      console.log(data.results[0])
-
 
       if (!data.results || data.results.length === 0) {
         setErrorMessage('No movies found')
@@ -83,22 +85,20 @@ function App() {
 
   const loadTrendingMovies = async () => {
     try {
-      const movies = await getTrendingMovies()
-
-      setTrendingMovies(movies)
-    } catch (error) {
-      console.error(`Error fetching trending movies: ${error}`)
-
+      const movies = await getTrendingMovies();
+      setTrendingMovies(movies);
+    } catch {
+      // Optionally handle error
     }
-  }
+  };
 
   useEffect(() => {
     fetchMovies(debouncedSearchTerm);
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm]);
 
   useEffect(() => {
-    loadTrendingMovies()
-  }, [])
+    loadTrendingMovies();
+  }, []);
 
   return (
     <main>
@@ -107,22 +107,23 @@ function App() {
       <div className="wrapper">
         <img src="./hero.png" alt="Hero Banner" />
         <header>
-          <h1>Find <span className="text-gradient">Movies</span> You'll Enjoy Without the Hassle</h1>
+          <h1>Find <span className="text-gradient">Movies</span> and <span className="text-gradient">Enjoy</span></h1>
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
-
-        {trendingMovies.length > 0 &&
+        {/* Trending Movies */}
+        {trendingMovies && trendingMovies.length > 0 && (
           <section className="trending">
             <h2>Trending Movies</h2>
             <ul>
               {trendingMovies.map((movie, index) => (
-                <li key={movie.$id} >
+                <li key={movie.$id}>
                   <p>{index + 1}</p>
                   <img src={movie.poster_url} />
                 </li>
               ))}
             </ul>
-          </section>}
+          </section>
+        )}
 
 
         <section className="all-movies">
@@ -132,12 +133,13 @@ function App() {
             <Spinner />
           ) : errorMessage ? (
             <p className="text-red-500">{errorMessage}</p>
-          ) :
+          ) : (
             <ul>
               {movieList.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
-            </ul>}
+            </ul>
+          )}
         </section>
 
       </div>
