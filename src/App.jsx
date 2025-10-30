@@ -60,8 +60,8 @@ function App() {
       console.log(data.results[0])
 
 
-      if (data.Response === 'False') {
-        setErrorMessage(Error.data || 'failed to fetch movies')
+      if (!data.results || data.results.length === 0) {
+        setErrorMessage('No movies found')
         setMovieList([]);
         return
       }
@@ -75,7 +75,7 @@ function App() {
 
     } catch (error) {
       console.log(`Error fetching movies: ${error}`)
-      setErrorMessage(`Error fetching movies, Please try again later`)
+      setErrorMessage(`Error fetching movies: ${error.message}`)
     } finally {
       setIsLoading(false);
     }
