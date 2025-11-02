@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Search from './Search'
 
-const Navbar = ({ activeFilter, onFilterChange, searchTerm, setSearchTerm }) => {
+const Navbar = ({ activeFilter, onFilterChange, searchTerm, setSearchTerm, theme, onToggleTheme }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   // Fechar menu ao redimensionar para desktop
@@ -71,6 +71,17 @@ const Navbar = ({ activeFilter, onFilterChange, searchTerm, setSearchTerm }) => 
               </button>
             </li>
           ))}
+          <li>
+            <button
+              className="navbar-link theme-toggle"
+              onClick={onToggleTheme}
+              aria-label={`Mudar para tema ${theme === 'dark' ? 'claro' : 'escuro'}`}
+              title={`Tema ${theme === 'dark' ? 'escuro' : 'claro'} ativo`}
+            >
+              <span className="navbar-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+            </button>
+          </li>
         </ul>
 
         {/* Botão Hambúrguer */}
@@ -121,6 +132,21 @@ const Navbar = ({ activeFilter, onFilterChange, searchTerm, setSearchTerm }) => 
               </button>
             </li>
           ))}
+          <li className="navbar-menu-divider">
+            <button
+              className="navbar-menu-item theme-toggle-mobile"
+              onClick={() => {
+                onToggleTheme()
+                setIsOpen(false)
+              }}
+              aria-label={`Mudar para tema ${theme === 'dark' ? 'claro' : 'escuro'}`}
+            >
+              <span className="navbar-menu-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="navbar-menu-text">
+                Tema {theme === 'dark' ? 'Claro' : 'Escuro'}
+              </span>
+            </button>
+          </li>
         </ul>
       </div>
     </nav>
@@ -128,4 +154,3 @@ const Navbar = ({ activeFilter, onFilterChange, searchTerm, setSearchTerm }) => 
 }
 
 export default Navbar
-

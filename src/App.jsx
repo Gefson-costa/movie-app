@@ -28,7 +28,7 @@ const getTypeFromFilter = (filter) => {
 
 function buildTmdbRequest(query, filter = 'movies') {
   const { type, genreId } = getTypeFromFilter(filter)
-  
+
   if (TMDB_TOKEN) {
     let endpoint
     if (query) {
@@ -43,7 +43,7 @@ function buildTmdbRequest(query, filter = 'movies') {
         endpoint = `https://api.themoviedb.org/3/discover/${type}?sort_by=popularity.desc`
       }
     }
-    
+
     const options = {
       method: 'GET',
       headers: {
@@ -53,7 +53,7 @@ function buildTmdbRequest(query, filter = 'movies') {
     }
     return { endpoint, options }
   }
-  
+
   // Sem token no client: usar proxy serverless
   let endpoint
   if (query) {
@@ -77,7 +77,21 @@ function App() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [trendingMovies, setTrendingMovies] = useState([])
   const [activeFilter, setActiveFilter] = useState('movies') // 'movies', 'series', 'anime'
+  const [theme, setTheme] = useState(() => {
+    // Recuperar tema salvo do localStorage ou usar 'dark' como padrão
+    const savedTheme = localStorage.getItem('theme')
+    return savedTheme || 'dark'
+  })
 
+  // Aplicar tema ao documento
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark')
+  }
 
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 
@@ -166,11 +180,13 @@ function App() {
 
   return (
     <main>
-      <Navbar 
-        activeFilter={activeFilter} 
+      <Navbar
+        activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
       <div className="pattern" />
 
