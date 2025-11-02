@@ -2,6 +2,10 @@
 import React from 'react'
 
 const Search = ({ searchTerm, setSearchTerm }) => {
+  const handleClear = () => {
+    setSearchTerm('')
+  }
+
   return (
     <div className='search'>
       <div>
@@ -9,10 +13,21 @@ const Search = ({ searchTerm, setSearchTerm }) => {
 
         <input 
           type='text'
-          placeholder='Search thought thousands of movies'
+          placeholder='Search through thousands of movies'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+
+        {searchTerm && (
+          <button 
+            onClick={handleClear}
+            className="clear-button"
+            aria-label="Limpar busca"
+            type="button"
+          >
+            ✕
+          </button>
+        )}
       </div>
     </div>
   )
