@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
 import { useDebounce } from "react-use";
@@ -167,14 +166,18 @@ function App() {
 
   return (
     <main>
-      <Navbar activeFilter={activeFilter} onFilterChange={handleFilterChange} />
+      <Navbar 
+        activeFilter={activeFilter} 
+        onFilterChange={handleFilterChange}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
       <div className="pattern" />
 
       <div className="wrapper">
         <img src="./hero.png" alt="Hero Banner" />
         <header>
           <h1>Find <span className="text-gradient">Movies</span> and <span className="text-gradient">Enjoy</span></h1>
-          <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
         {/* Trending Movies */}
         {trendingMovies && trendingMovies.length > 0 && (

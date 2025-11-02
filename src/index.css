@@ -36,7 +36,14 @@
   }
 
   main {
-    @apply min-h-screen relative bg-primary pt-20;
+    @apply min-h-screen relative bg-primary;
+    padding-top: 80px; /* Espaço para navbar + busca mobile */
+  }
+
+  @media (min-width: 1024px) {
+    main {
+      padding-top: 72px; /* Apenas navbar no desktop */
+    }
   }
 
   header {
@@ -55,7 +62,7 @@
   }
 
   .navbar-container {
-    @apply max-w-7xl mx-auto px-5 py-4 flex items-center justify-between;
+    @apply max-w-7xl mx-auto px-5 py-3 flex items-center justify-between gap-4;
   }
 
   .navbar-logo {
@@ -70,8 +77,33 @@
     @apply text-xl font-bold text-white hidden sm:block;
   }
 
+  /* Barra de Pesquisa no Navbar */
+  .navbar-search-desktop {
+    @apply hidden lg:flex flex-1 max-w-md mx-6;
+  }
+
+  .navbar-search-mobile {
+    @apply lg:hidden px-5 pb-3 border-t border-light-100/10;
+  }
+
+  .navbar-search-desktop .search {
+    @apply mt-0;
+  }
+
+  .navbar-search-mobile .search {
+    @apply mt-0;
+  }
+
+  .navbar-search-desktop .search input {
+    @apply py-1.5 text-sm;
+  }
+
+  .navbar-search-mobile .search input {
+    @apply py-2 text-sm;
+  }
+
   .navbar-menu-desktop {
-    @apply hidden md:flex items-center gap-2 list-none;
+    @apply hidden lg:flex items-center gap-2 list-none;
   }
 
   .navbar-link {
@@ -92,7 +124,7 @@
 
   /* Hamburger Button */
   .hamburger {
-    @apply md:hidden flex flex-col gap-1.5 p-2 bg-transparent border-none cursor-pointer z-50 relative;
+    @apply lg:hidden flex flex-col gap-1.5 p-2 bg-transparent border-none cursor-pointer z-50 relative;
   }
 
   .hamburger-line {
@@ -113,7 +145,7 @@
 
   /* Mobile Menu Overlay */
   .navbar-overlay {
-    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40 opacity-0 invisible transition-all duration-300 md:hidden;
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40 opacity-0 invisible transition-all duration-300 lg:hidden;
   }
 
   .navbar-overlay.active {
@@ -122,7 +154,7 @@
 
   /* Mobile Menu */
   .navbar-menu-mobile {
-    @apply fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-dark-100 border-l border-light-100/10 z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden;
+    @apply fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-dark-100 border-l border-light-100/10 z-50 transform translate-x-full transition-transform duration-300 ease-in-out lg:hidden;
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
   }
 

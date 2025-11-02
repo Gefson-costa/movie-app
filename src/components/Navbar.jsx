@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
+import Search from './Search'
 
-const Navbar = ({ activeFilter, onFilterChange }) => {
+const Navbar = ({ activeFilter, onFilterChange, searchTerm, setSearchTerm }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   // Fechar menu ao redimensionar para desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setIsOpen(false)
       }
     }
@@ -51,6 +52,11 @@ const Navbar = ({ activeFilter, onFilterChange }) => {
           <span className="logo-text">MovieApp</span>
         </div>
 
+        {/* Barra de Pesquisa - Desktop */}
+        <div className="navbar-search-desktop">
+          <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
+
         {/* Menu Desktop */}
         <ul className="navbar-menu-desktop">
           {menuItems.map((item) => (
@@ -79,6 +85,11 @@ const Navbar = ({ activeFilter, onFilterChange }) => {
           <span className="hamburger-line"></span>
           <span className="hamburger-line"></span>
         </button>
+      </div>
+
+      {/* Barra de Pesquisa - Mobile (sempre visível no navbar) */}
+      <div className="navbar-search-mobile">
+        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
 
       {/* Menu Mobile Overlay */}
