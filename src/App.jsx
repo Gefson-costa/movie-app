@@ -77,6 +77,8 @@ function App() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [trendingMovies, setTrendingMovies] = useState([])
   const [activeFilter, setActiveFilter] = useState('movies') // 'movies', 'series', 'anime'
+  const [isLoadingTrending, setIsLoadingTrending] = useState(false)
+  const [trendingError, setTrendingError] = useState(null)
   const [theme, setTheme] = useState(() => {
     // Recuperar tema salvo do localStorage ou usar 'dark' como padrão
     const savedTheme = localStorage.getItem('theme')
@@ -143,11 +145,16 @@ function App() {
   }
 
   const loadTrendingMovies = async () => {
+    setIsLoadingTrending(true);
+    setTrendingError(null);
     try {
       const movies = await getTrendingMovies();
-      setTrendingMovies(movies);
-    } catch {
-      // Optionally handle error
+      setTrendingMovies(movies || []);
+    } catch (error) {
+      console.error('Erro ao carregar filmes em destaque:', error);
+      setTrendingError('Não foi possível carregar filmes em destaque');
+    } finally {
+      setIsLoadingTrending(false);
     }
   };
 
@@ -196,19 +203,31 @@ function App() {
           <h1>Find <span className="text-gradient">Movies</span> and <span className="text-gradient">Enjoy</span></h1>
         </header>
         {/* Trending Movies */}
-        {trendingMovies && trendingMovies.length > 0 && (
-          <section className="trending">
-            <h2>Trending Movies</h2>
+        <section className="trending" aria-label="Filmes em destaque">
+          <h2>Trending Movies</h2>
+          {isLoadingTrending ? (
+            <div className="flex justify-center py-8">
+              <Spinner />
+            </div>
+          ) : trendingError ? (
+            <div className="text-yellow-500 text-center py-4">
+              {trendingError}
+            </div>
+          ) : trendingMovies && trendingMovies.length > 0 ? (
             <ul>
               {trendingMovies.map((movie, index) => (
                 <li key={movie.$id}>
                   <p>{index + 1}</p>
-                  <img src={movie.poster_url} />
+                  <img src={movie.poster_url} alt={movie.searchTerm} />
                 </li>
               ))}
             </ul>
-          </section>
-        )}
+          ) : (
+            <div className="text-gray-500 text-center py-4">
+              Faça buscas para ver filmes em destaque!
+            </div>
+          )}
+        </section>
 
 
         <section className="all-movies">
